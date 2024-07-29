@@ -1,9 +1,16 @@
 // weather_event.dart
-abstract class WeatherEvent {}
+import 'package:equatable/equatable.dart';
+
+abstract class WeatherEvent extends Equatable {
+  const WeatherEvent();
+}
 
 class FetchWeather extends WeatherEvent {
   final double latitude;
   final double longitude;
 
-  FetchWeather(this.latitude, this.longitude);
+  const FetchWeather({required this.latitude, required this.longitude});
+
+  @override
+  List<Object> get props => [latitude, longitude];
 }

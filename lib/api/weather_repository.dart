@@ -1,18 +1,42 @@
 // weather_repository.dart
-import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../model/weather_response_model.dart';
-
+import 'dart:convert';
 
 class WeatherRepository {
   final String apiKey = '322937af7c964fa0a16154949241407';
 
-  Future<WeatherResponse> fetchWeather(double latitude, double longitude) async {
-    final response = await http.get(Uri.parse('https://api.weatherapi.com/v1/current.json?key=$apiKey&q=$latitude,$longitude'));
+  Future<Weather> fetchWeather(double latitude, double longitude) async {
+    final response = await http.post(
+      Uri.parse('http://api.weatherapi.com/v1/current.json or /current.xml?q=$latitude,$longitude'),
+      headers: {
+        'key': apiKey,
+      },
+
+
+    );
+    print(response);
+
     if (response.statusCode == 200) {
-      return WeatherResponse.fromJson(json.decode(response.body));
+      return Weather.fromJson(json.decode(response.body));
     } else {
+
       throw Exception('Failed to load weather');
     }
+  }
+}
+
+class Weather {
+  final String locationName;
+  final double temperature;
+  final String condition;
+
+  Weather({required this.locationName, required this.temperature, required this.condition});
+
+  factory Weather.fromJson(Map<String, dynamic> json) {
+    return Weather(
+      locationName: json['location']['name'],
+      temperature: json['current']['temp_c'],
+      condition: json['current']['condition']['text'],
+    );
   }
 }

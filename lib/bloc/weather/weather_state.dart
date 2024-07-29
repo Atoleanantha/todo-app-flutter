@@ -1,19 +1,34 @@
-import '../../model/weather_response_model.dart';
+// weather_state.dart
+import 'package:equatable/equatable.dart';
 
-abstract class WeatherState {}
+import '../../api/weather_repository.dart';
+
+abstract class WeatherState extends Equatable {
+  const WeatherState();
+
+  @override
+  List<Object> get props => [];
+}
 
 class WeatherInitial extends WeatherState {}
 
 class WeatherLoading extends WeatherState {}
 
 class WeatherLoaded extends WeatherState {
-  final WeatherResponse weatherResponse;
+  final Weather weather;
 
-  WeatherLoaded(this.weatherResponse);
+  const WeatherLoaded({required this.weather});
+
+  @override
+  List<Object> get props => [weather];
 }
 
 class WeatherError extends WeatherState {
   final String message;
 
-  WeatherError(this.message);
+
+  const WeatherError({required this.message});
+
+  @override
+  List<Object> get props => [message];
 }

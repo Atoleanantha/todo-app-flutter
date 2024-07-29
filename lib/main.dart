@@ -1,11 +1,16 @@
+// main.dart (continued)
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_manager/screens/add_todo_bottonsheet.dart';
 import 'package:todo_manager/screens/priority_task_page.dart';
 import 'package:todo_manager/screens/todo_page.dart';
+
 import 'api/weather_repository.dart';
 import 'bloc/todo_bloc.dart';
 import 'bloc/todo_event.dart';
+import 'bloc/weather/weather_bloc.dart';
+import 'bloc/weather/weather_event.dart';
 import 'model/todo.model.dart';
 
 void main() {
@@ -15,21 +20,31 @@ void main() {
 
 class MyApp extends StatelessWidget {
   final WeatherRepository weatherRepository;
+
   MyApp({required this.weatherRepository});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => TodoBloc()..add(LoadTodos()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => TodoBloc()..add(LoadTodos()),
+        ),
+        BlocProvider<WeatherBloc>(
+          create: (context) => WeatherBloc(weatherRepository),
+        ),
+      ],
       child: MaterialApp(
         darkTheme: ThemeData.dark(),
-        home: MainPage(weatherRepository: weatherRepository,),
+        home: MainPage(weatherRepository: weatherRepository),
       ),
     );
   }
 }
+
 class MainPage extends StatefulWidget {
   final WeatherRepository weatherRepository;
+
   const MainPage({super.key, required this.weatherRepository});
 
   @override
@@ -60,11 +75,10 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Todo App'),
-
       ),
-      body:Padding(
+      body: Padding(
         padding: EdgeInsets.all(10),
-        child:  _pages[_selectedIndex],
+        child: _pages[_selectedIndex],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -81,7 +95,8 @@ class _MainPageState extends State<MainPage> {
         selectedItemColor: Colors.amber[800],
         onTap: _onItemTapped,
       ),
-      floatingActionButton: _selectedIndex == 0 ? FloatingActionButton(
+      floatingActionButton: _selectedIndex == 0
+          ? FloatingActionButton(
         tooltip: "ADD TODO",
         onPressed: () {
           showModalBottomSheet(
@@ -107,11 +122,9 @@ class _MainPageState extends State<MainPage> {
             },
           );
         },
-        child:
-            Icon(Icons.add),
-      ) : null,
+        child: Icon(Icons.add),
+      )
+          : null,
     );
   }
 }
-
-
